@@ -1,4 +1,4 @@
-# Desccription
+# Description
 
 This project was completed as part of a selection process for a company.
 It involved building an ETL pipeline using Docker to extract data from two sources, a Postgres database and a CSV file, and load it into a PostgreSQL database. 
