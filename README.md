@@ -1,17 +1,21 @@
-# code-challenge
-Indicium code challenge for Software Developer focusing on data projects
+# Desccription
 
-# Indicium Tech Code Challenge
+This project was completed as part of a selection process for a company.
+It involved building an ETL pipeline using Docker to extract data from two sources, a Postgres database and a CSV file, and load it into a PostgreSQL database. 
+The data is first saved to the local machine, transformed into Parquet format, and then sent to the PostgreSQL database. 
+The challenge involves building a pipeline that can run every day and extract data from both sources, write it to the local disk, and then load it into a database. 
+The final goal is to be able to run a query that shows the orders and their details.
 
-Code challenge for Software Developer with focus in data projects.
+## Requirements
 
-
-## Context
-
-At Indicium we have many projects where we develop the whole data pipeline for our client, from extracting data from many data sources to loading this data at its final destination, with this final destination varying from a data warehouse for a Business Intelligency tool to an api for integrating with third party systems.
-
-As a software developer with focus in data projects your mission is to plan, develop, deploy, and maintain a data pipeline.
-
+- All tasks should be idempotent, you should be able the whole pipeline for a day and the result should be always the same
+- Step 2 depends on both tasks of step 1, so you should not be able to run step 2 for a day if the tasks from step 1 did not succeed
+- You should extract all the tables from the source database, it does not matter that you will not use most of them for the final step.
+- You should be able to tell where the pipeline failed clearly, so you know from which step you should rerun the pipeline
+- You have to provide clear instructions on how to run the whole pipeline. The easier the better.
+- You have to provide a csv or json file with the result of the final query at the final database.
+- You dont have to actually schedule the pipeline, but you should assume that it will run for different days.
+- Your pipeline should be prepared to run for past days, meaning you should be able to pass an argument to the pipeline with a day from the past, and it should reprocess the data for that day. Since the data for this challenge is static, the only difference for each day of execution will be the output paths.
 
 ## The Challenge
 
@@ -50,31 +54,11 @@ The pipeline will look something like this:
 
 ![image](https://user-images.githubusercontent.com/49417424/105993225-e2aefb00-6084-11eb-96af-3ec3716b151a.png)
 
-
-
-## Requirements
-
-- All tasks should be idempotent, you should be able the whole pipeline for a day and the result should be always the same
-- Step 2 depends on both tasks of step 1, so you should not be able to run step 2 for a day if the tasks from step 1 did not succeed
-- You should extract all the tables from the source database, it does not matter that you will not use most of them for the final step.
-- You should be able to tell where the pipeline failed clearly, so you know from which step you should rerun the pipeline
-- You have to provide clear instructions on how to run the whole pipeline. The easier the better.
-- You have to provide a csv or json file with the result of the final query at the final database.
-- You dont have to actually schedule the pipeline, but you should assume that it will run for different days.
-- Your pipeline should be prepared to run for past days, meaning you should be able to pass an argument to the pipeline with a day from the past, and it should reprocess the data for that day. Since the data for this challenge is static, the only difference for each day of execution will be the output paths.
-
-## Things that Matters
-
-- Clean and organized code.
-- Good decisions at which step (which database, which file format..) and good arguments to back those decisions up.
+# Instructions
 
 ## Setup of the source database
 
-The source database can be set up using docker compose.
-You can install following the instructions at 
-https://docs.docker.com/compose/install/
-
-With docker compose installed simply run
+With docker compose installed simply run:
 
 ```
 docker-compose up
@@ -82,9 +66,99 @@ docker-compose up
 
 You can find the credentials at the docker-compose.yml file
 
-## Final Instruction
+<mark>Attention: The Docker file used is no longer available.</mark>
 
-You can use any language you like, but keep in mind that we will have to run your pipeline, so choosing some languague or tooling that requires a complex environment might not be a good idea.
-You are free to use opensource libs and frameworks, but also keep in mind that **you have to write code**. Point and click tools are not allowed.
 
-Thank you for participating!
+## Create the target postgres server
+
+Use pgAdmin to create the destination server, make sure that:
+
+host     = "localhost"
+port     = "5433"
+user     = "postgres"
+password = "0102"
+
+
+## Create the target postgres database
+
+Use pgAdmin to create the destination database as in:
+
+```
+CREATE DATABASE db_lh_challenge
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Portuguese_Brazil.1252'
+    LC_CTYPE = 'Portuguese_Brazil.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+```
+
+## execute the Python script
+
+Use your terminal to access code-challenge folder and run etl.py
+
+It will prompt you to enter a date
+
+## Query the final database
+
+Use the following sql script to show the orders and its details 
+
+```
+SELECT * FROM order_details od INNER JOIN orders o ON OD.order_id = O.order_id
+```
+
+#########################
+
+## Setup of the source database
+
+With docker compose installed simply run:
+
+```
+docker-compose up
+```
+
+You can find the credentials at the docker-compose.yml file
+
+
+## Create the target postgres server
+
+Use pgAdmin to create the destination server, make sure that:
+
+host     = "localhost"
+port     = "5433"
+user     = "postgres"
+password = "0102"
+
+
+## Create the target postgres database
+
+Use pgAdmin to create the destination database as in:
+
+```
+CREATE DATABASE db_lh_challenge
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Portuguese_Brazil.1252'
+    LC_CTYPE = 'Portuguese_Brazil.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+```
+
+## execute the Python script
+
+Use your terminal to access code-challenge folder and run etl.py
+
+It will prompt you to enter a date
+
+
+## Query the final database
+
+Use the following sql script to show the orders and its details 
+
+```
+SELECT * FROM order_details od INNER JOIN orders o ON OD.order_id = O.order_id
+```
